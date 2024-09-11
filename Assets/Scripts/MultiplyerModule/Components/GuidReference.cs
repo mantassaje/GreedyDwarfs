@@ -21,28 +21,28 @@ public class GuidReference : MonoBehaviourPunCallbacks
     {
         PhotonView = GetComponent<PhotonView>();
 
-        if (PhotonNetwork.IsMasterClient)
-        {
-            Id = Guid.NewGuid();
-            DebugIdShow = Id.ToString();
-
-            PhotonView.RPC(nameof(RpcSync), RpcTarget.AllBufferedViaServer, Id.ToString());
-        }
+        GenerateGuidIfNull();
     }
 
     public override void OnJoinedRoom()
     {
-        if (PhotonNetwork.IsMasterClient)
+        GenerateGuidIfNull();
+    }
+
+    private void GenerateGuidIfNull()
+    {
+        if (PhotonNetwork.IsMasterClient
+            && Id == Guid.Empty)
         {
             Id = Guid.NewGuid();
             DebugIdShow = Id.ToString();
 
-            PhotonView.RPC(nameof(RpcSync), RpcTarget.AllBufferedViaServer, Id.ToString());
+            PhotonView.RPC(nameof(RpcSyncGuid), RpcTarget.AllBufferedViaServer, Id.ToString());
         }
     }
 
     [PunRPC]
-    private void RpcSync(string guidId)
+    private void RpcSyncGuid(string guidId)
     {
         Id = new Guid(guidId);
         DebugIdShow = Id.ToString();

@@ -16,11 +16,13 @@ public class InteractActor : MonoBehaviour
 
     public IInteractActorAction[] InteractActorActions { get; private set; }
     public PhotonView PhotonView { get; private set; }
+    public Player Player { get; private set; }
 
     private void Awake()
     {
         InteractActorActions = GetComponents<IInteractActorAction>();
         PhotonView = GetComponent<PhotonView>();
+        Player = GetComponent<Player>();
     }
 
     private Interactable GetInteractableInMousePosition()
