@@ -7,6 +7,7 @@ using UnityEngine.SceneManagement;
 public class RulesController : MonoBehaviour
 {
     public int GoldCount;
+    public int GoldGoalPerPlayer = 3;
     public int GoldGoal = 3;
     public bool IsGameOver = false;
     public bool IsGoldCollected = false;
@@ -30,7 +31,12 @@ public class RulesController : MonoBehaviour
         ScoreSheetController = FindObjectOfType<ScoreSheetController>();
         RoundTimer.OnTimerEnd.AddListener(EndTime);
         RoundTimer.StartTimer(RoundTotalSeconds);
-        Sync();
+
+        if (PhotonNetwork.IsMasterClient)
+        {
+            GoldGoal = PhotonNetwork.CurrentRoom.PlayerCount * GoldGoalPerPlayer;
+            Sync();
+        }
     }
 
     public void AddGoldToTotal()
@@ -67,6 +73,7 @@ public class RulesController : MonoBehaviour
     private void SetEndGame()
     {
         IsGameOver = true;
+        RoundTimer.IsRunning = false;
         Debug.Log("Game over. Reloading in 10 seconds");
         Invoke(nameof(ReloadScene), 10);
     }
@@ -178,7 +185,8 @@ public class RulesController : MonoBehaviour
     public void SetHiddenCacheOwner(InteractActor player)
     {
         var caches = FindObjectsOfType<HideCache>()
-            .Where(cache => cache.Owner == null)
+            .Where(cache => cache.Owner == null
+                && !cache.IsBroken)
             .ToList();
 
         for (int i = 0; i < HiddenCacheCountForOwner; i++)
@@ -192,12 +200,13 @@ public class RulesController : MonoBehaviour
 
     private void Sync()
     {
-        PhotonView.RPC(nameof(RpcSync), RpcTarget.AllBufferedViaServer, GoldCount, IsGameOver, IsGoldCollected);
+        PhotonView.RPC(nameof(RpcSync), RpcTarget.AllBufferedViaServer, GoldGoal, GoldCount, IsGameOver, IsGoldCollected);
     }
 
     [PunRPC]
-    private void RpcSync(int goldCount, bool isGameOver, bool isGoldCollected)
+    private void RpcSync(int goldGoal, int goldCount, bool isGameOver, bool isGoldCollected)
     {
+        GoldGoal = goldGoal;
         GoldCount = goldCount;
         IsGameOver = isGameOver;
         IsGoldCollected = isGoldCollected;

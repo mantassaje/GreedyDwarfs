@@ -8,6 +8,7 @@ public class Player : MonoBehaviour
 {
     public PhotonView PhotonView { get; private set; }
     private NotificationText _notificationText;
+    private bool _areCachesAssigned = false;
 
     private void Awake()
     {
@@ -18,11 +19,29 @@ public class Player : MonoBehaviour
     {
         Debug.Log($"PhotonView.Owner.UserId {PhotonView.Owner.UserId}.");
 
-        /*PlayerData = FindObjectsOfType<PlayerData>()
-            .ToList()
-            .First(data => data.PhotonView.Owner.UserId == PhotonView.Owner.UserId);*/
-
         _notificationText = FindObjectOfType<NotificationText>();
+    }
+
+    private void Update()
+    {
+        if (!_areCachesAssigned
+            && PhotonNetwork.IsMasterClient)
+        {
+            FindObjectOfType<RulesController>().SetHiddenCacheOwner(GetComponent<InteractActor>());
+            _areCachesAssigned = true;
+            Sync();
+        }
+    }
+
+    public void Sync()
+    {
+        PhotonView.RPC(nameof(RpcSync), RpcTarget.AllBufferedViaServer, _areCachesAssigned);
+    }
+
+    [PunRPC]
+    private void RpcSync(bool areCachesAssigned)
+    {
+        _areCachesAssigned = areCachesAssigned;
     }
 
     public void Notify(string message)

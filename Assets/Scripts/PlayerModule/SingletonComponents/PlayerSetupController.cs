@@ -30,19 +30,6 @@ public class PlayerSetupController : MonoBehaviour
 
         var mainCamera = FindObjectOfType<MainCamera>().GetComponent<SmoothCamera2D>();
         mainCamera.target = _localPlayer.transform;
-
-        Invoke(nameof(InvokeDelayedSetup), 2);
-    }
-
-    /// <summary>
-    /// Hack
-    /// </summary>
-    private void InvokeDelayedSetup()
-    {
-        //TODO change to request from master. Collide risk.
-        FindObjectOfType<RulesController>().SetHiddenCacheOwner(_localPlayer.GetComponent<InteractActor>());
-
-        _localPlayer.GetComponent<Player>().Notify("Joined game");
     }
 
 }

@@ -99,7 +99,8 @@ public class HideCache : MonoBehaviour, IInteractable
 
     private void DrawBrake()
     {
-        SpriteRenderer.color = new Color(0.2f, 0.2f, 0.2f, 0.5f);
+        SpriteRenderer.color = new Color(0.2f, 0.2f, 0.2f, 0.2f);
+        HighlightForOwner.gameObject.SetActive(false);
     }
 
     private void Sync()

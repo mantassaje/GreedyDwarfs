@@ -6,6 +6,8 @@ public class PanelController : MonoBehaviour
 {
     private EndGameScorePanel _endGamePanel;
     private RulesController _rulesController;
+    private ScorePanel _scorePanel;
+    private Camera _mapCamera;
 
     void Start()
     {
@@ -13,11 +15,14 @@ public class PanelController : MonoBehaviour
         _endGamePanel.gameObject.SetActive(false);
 
         _rulesController = FindObjectOfType<RulesController>();
+        _scorePanel = FindObjectOfType<ScorePanel>();
+
+        _mapCamera = FindObjectOfType<MapCamera>().GetComponent<Camera>();
     }
 
-    // Update is called once per frame
     void Update()
     {
         _endGamePanel.gameObject.SetActive(_rulesController.IsGameOver);
+        _scorePanel.gameObject.SetActive(_mapCamera.enabled);
     }
 }

@@ -9,10 +9,14 @@ public class HideInMap : MonoBehaviour
     private SpriteRenderer SpriteRenderer;
     private Sprite _originalSprite;
 
+
+    private Canvas Canvas;
+
     private void Awake()
     {
         MapCamera = FindObjectOfType<MapCamera>().GetComponent<Camera>();
         SpriteRenderer = GetComponent<SpriteRenderer>();
+        Canvas = GetComponent<Canvas>();
     }
 
     /// <summary>
@@ -23,17 +27,27 @@ public class HideInMap : MonoBehaviour
         if (MapCamera != null
             && MapCamera.enabled)
         {
-            if (_originalSprite == null)
+            if (SpriteRenderer != null)
             {
-                _originalSprite = SpriteRenderer.sprite;
+                SpriteRenderer.enabled = false;
             }
 
-            SpriteRenderer.sprite = null;
+            if (Canvas != null)
+            {
+                Canvas.enabled = false;
+            }
         }
-        else if (_originalSprite != null)
+        else
         {
-            SpriteRenderer.sprite = _originalSprite;
-            _originalSprite = null;
+            if (SpriteRenderer != null)
+            {
+                SpriteRenderer.enabled = true;
+            }
+
+            if (Canvas != null)
+            {
+                Canvas.enabled = true;
+            }
         }
     }
 }

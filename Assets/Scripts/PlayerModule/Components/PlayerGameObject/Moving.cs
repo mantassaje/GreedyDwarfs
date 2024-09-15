@@ -1,3 +1,4 @@
+using Photon.Pun;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -5,17 +6,23 @@ using UnityEngine;
 
 
 [RequireComponent(typeof(Rigidbody2D))]
-public class Moving : MonoBehaviour
+[RequireComponent(typeof(PhotonView))]
+public class Moving : MonoBehaviour, IPunObservable
 {
     public float MaxSpeed = 25;
-    public float VerticalLimit = 50;
-    public float HorizontalLimit = 50;
 
     public Rigidbody2D Body { get; private set; }
+    public PhotonView PhotonView { get; private set; }
+
+    /// <summary>
+    /// Used by other players that do not controll this object.
+    /// </summary>
+    private Vector2? _velocityGuess;
 
     private void Awake()
     {
         Body = GetComponent<Rigidbody2D>();
+        PhotonView = GetComponent<PhotonView>();
     }
 
     /// <summary>
@@ -48,5 +55,33 @@ public class Moving : MonoBehaviour
     public void MoveBottom()
     {
         Rigidbody2DHelper.MoveBottom(Body, MaxSpeed);
+    }
+
+    private void FixedUpdate()
+    {
+        if (!PhotonView.IsMine
+            && _velocityGuess.HasValue)
+        {
+            Body.velocity = _velocityGuess.Value;
+        }
+    }
+
+    public void OnPhotonSerializeView(PhotonStream stream, PhotonMessageInfo info)
+    {
+        if (stream.IsWriting)
+        {
+            stream.SendNext(MaxSpeed);
+            stream.SendNext(Body.velocity.x);
+            stream.SendNext(Body.velocity.y);
+        }
+        else
+        {
+            MaxSpeed = (float)stream.ReceiveNext();
+            var x = (float)stream.ReceiveNext();
+            var y = (float)stream.ReceiveNext();
+
+            _velocityGuess = new Vector2(x, y);
+            Body.velocity = _velocityGuess.Value;
+        }
     }
 }

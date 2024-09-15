@@ -14,6 +14,7 @@ public class InputControll : MonoBehaviour
     public InteractActor InteractActor { get; private set; }
     public MapMode MapMode { get; private set; }
     public PhotonView PhotonView { get; private set; }
+    private RulesController _rulesController;
 
     private void Awake()
     {
@@ -21,6 +22,7 @@ public class InputControll : MonoBehaviour
         InteractActor = GetComponent<InteractActor>();
         MapMode = GetComponent<MapMode>();
         PhotonView = GetComponent<PhotonView>();
+        _rulesController = FindObjectOfType<RulesController>();
     }
 
     private void Update()
@@ -29,6 +31,13 @@ public class InputControll : MonoBehaviour
         {
             return;
         }
+
+        if (_rulesController.IsGameOver)
+        {
+            MapMode.IsMapMode = false;
+            return;
+        }
+
         if (Input.GetKey(KeyCode.Tab))
         {
             MapMode.IsMapMode = true;
@@ -47,7 +56,9 @@ public class InputControll : MonoBehaviour
 
     private void FixedUpdate()
     {
-        if (!PhotonView.IsMine)
+        if (!PhotonView.IsMine
+            || MapMode.IsMapMode
+            || _rulesController.IsGameOver)
         {
             return;
         }

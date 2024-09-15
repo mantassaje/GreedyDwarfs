@@ -9,7 +9,7 @@ public class MultiplayerTimer : MonoBehaviour, IPunObservable
     private PhotonView PhotonView;
 
     public float SecondsRemaining = 10;
-    public bool IsRunning { get; private set; }
+    public bool IsRunning { get; set; }
 
     private int _syncEveryTick = 1000;
     private int _leftTick;
@@ -49,9 +49,21 @@ public class MultiplayerTimer : MonoBehaviour, IPunObservable
     {
         if (PhotonNetwork.IsMasterClient)
         {
-            IsRunning = true;
-            SecondsRemaining = seconds;
+            CommitStartTimer(seconds);
+            PhotonView.RPC(nameof(RpcStartTimer), RpcTarget.Others, seconds);
         }
+    }
+
+    [PunRPC]
+    public void RpcStartTimer(float seconds)
+    {
+        CommitStartTimer(seconds);
+    }
+
+    private void CommitStartTimer(float seconds)
+    {
+        IsRunning = true;
+        SecondsRemaining = seconds;
     }
 
     public void OnPhotonSerializeView(PhotonStream stream, PhotonMessageInfo info)
@@ -59,10 +71,12 @@ public class MultiplayerTimer : MonoBehaviour, IPunObservable
         if (stream.IsWriting)
         {
             stream.SendNext(SecondsRemaining);
+            stream.SendNext(IsRunning);
         }
         else
         {
             SecondsRemaining = (float)stream.ReceiveNext();
+            IsRunning = (bool)stream.ReceiveNext();
         }
     }
 

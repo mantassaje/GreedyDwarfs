@@ -160,9 +160,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   MaxHitsAdd: 5
-  MaxGoldAdd: 5
+  MaxGoldAdd: 3
   MinHits: 3
-  MinGold: 3
+  MinGold: 2
   GoldCount: 0
   HitCountLeft: 0
 --- !u!114 &7955919695688369204
