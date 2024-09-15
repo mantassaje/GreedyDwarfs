@@ -18,6 +18,7 @@ public class RulesController : MonoBehaviour
     public MultiplayerTimer RoundTimer;
 
     public PhotonView PhotonView { get; private set; }
+    public ScoreSheetController ScoreSheetController { get; private set; }
 
     private void Awake()
     {
@@ -26,8 +27,10 @@ public class RulesController : MonoBehaviour
 
     private void Start()
     {
+        ScoreSheetController = FindObjectOfType<ScoreSheetController>();
         RoundTimer.OnTimerEnd.AddListener(EndTime);
         RoundTimer.StartTimer(RoundTotalSeconds);
+        Sync();
     }
 
     public void AddGoldToTotal()
@@ -64,8 +67,8 @@ public class RulesController : MonoBehaviour
     private void SetEndGame()
     {
         IsGameOver = true;
-        Debug.Log("Game over. Reloading in 5 seconds");
-        Invoke(nameof(ReloadScene), 5);
+        Debug.Log("Game over. Reloading in 10 seconds");
+        Invoke(nameof(ReloadScene), 10);
     }
 
     public void ReloadScene()
@@ -83,37 +86,43 @@ public class RulesController : MonoBehaviour
     /// </summary>
     public void SetGameOverEndTimeScores()
     {
-        if (PhotonNetwork.IsMasterClient)
+        if (PhotonNetwork.IsMasterClient
+            && !IsGameOver)
         {
             IsGoldCollected = false;
 
             SetStolenLoot();
 
-            var players = FindObjectsOfType<PlayerData>();
-
-            var sortedGroup = players
+            if (!ScoreSheetController.ActorScoreSheets.Values.All(sheet => sheet.TotalStolenLootRound == 0))
+            {
+                var sortedGroup = ScoreSheetController.ActorScoreSheets.Values
                 .Where(player => player.TotalStolenLootRound > 0)
                 .GroupBy(player => player.TotalStolenLootRound)
                 .OrderByDescending(group => group.Key);
 
-            var topPlayersGroup = sortedGroup.First().ToList();
+                var topPlayersGroup = sortedGroup.First().ToList();
 
-            foreach(var player in topPlayersGroup)
-            {
-                player.AddToTotalScore(5);
+                foreach (var player in topPlayersGroup)
+                {
+                    player.TotalScore += 5;
+                    player.AddToTotalScoreRound = 5;
+                }
             }
+
+            ScoreSheetController.SyncAll();
         }
     }
 
     public void SetGameOverGoalSuccessScores()
     {
-        if (PhotonNetwork.IsMasterClient)
+        if (PhotonNetwork.IsMasterClient
+            && !IsGameOver)
         {
             IsGoldCollected = true;
 
             SetStolenLoot();
 
-            var players = FindObjectsOfType<PlayerData>();
+            var players = ScoreSheetController.ActorScoreSheets.Values.ToList();
 
             var sortedGroup = players
                 .GroupBy(player => player.TotalStolenLootRound)
@@ -131,28 +140,26 @@ public class RulesController : MonoBehaviour
 
             foreach (var player in topPlayersGroup)
             {
-                player.AddToTotalScore(2);
+                player.TotalScore += 2;
+                player.AddToTotalScoreRound = 2;
             }
 
             foreach (var player in midPlayers)
             {
                 if (player.AddToTotalScoreRound == 0)
                 {
-                    player.AddToTotalScore(1);
+                    player.TotalScore += 1;
+                    player.AddToTotalScoreRound = 1;
                 }
             }
+
+            ScoreSheetController.SyncAll();
         }
     }
 
     private void SetStolenLoot()
     {
-        var players = FindObjectsOfType<PlayerData>();
-
-        foreach(var player in players)
-        {
-            player.TotalStolenLootRound = 0;
-            player.AddToTotalScore(0);
-        }
+        ScoreSheetController.ResetRoundData();
 
         var caches = FindObjectsOfType<HideCache>();
 
@@ -161,7 +168,9 @@ public class RulesController : MonoBehaviour
             if (cache.Owner != null
                 && !cache.IsBroken)
             {
-                cache.Owner.Player.PlayerData.TotalStolenLootRound += cache.HiddenGoldCount;
+                var stolenGold = cache.HiddenGoldCount;
+
+                ScoreSheetController.ActorScoreSheets[cache.Owner.Player.PhotonView.Owner.ActorNumber].TotalStolenLootRound += stolenGold;
             }
         }
     }

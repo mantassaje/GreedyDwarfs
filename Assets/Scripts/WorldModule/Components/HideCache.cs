@@ -17,6 +17,8 @@ public class HideCache : MonoBehaviour, IInteractable
     public SpriteRenderer SpriteRenderer { get; private set; }
     public PhotonView PhotonView { get; private set; }
 
+    public GameObject GetGameObject => this.gameObject;
+
     void Awake()
     {
         SpriteRenderer = GetComponent<SpriteRenderer>();
@@ -54,12 +56,24 @@ public class HideCache : MonoBehaviour, IInteractable
 
     public bool Interact(InteractActor actor)
     {
-        if (IsBroken
-            || actor != Owner)
+        if (IsBroken)
         {
             return false;
         }
 
+        if (Owner == actor)
+        {
+            return Steal(actor);
+        }
+        else
+        {
+            return TryBreakCache(actor);
+        }
+        
+    }
+
+    private bool Steal(InteractActor actor)
+    {
         HiddenGoldCount++;
 
         Blink.BlinkOnce();
@@ -68,12 +82,11 @@ public class HideCache : MonoBehaviour, IInteractable
         return true;
     }
 
-    public bool BreakCache(InteractActor actor)
+    private bool TryBreakCache(InteractActor actor)
     {
-        if (actor == Owner
-            || HiddenGoldCount <= 0)
+        if (HiddenGoldCount <= 0)
         {
-            return false;
+            return true;
         }
 
         IsBroken = true;

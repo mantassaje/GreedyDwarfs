@@ -4,7 +4,7 @@ using UnityEngine;
 using UnityEngine.Events;
 
 [RequireComponent(typeof(PhotonView))]
-public class MultiplayerTimer : MonoBehaviour
+public class MultiplayerTimer : MonoBehaviour, IPunObservable
 {
     private PhotonView PhotonView;
 
@@ -29,7 +29,6 @@ public class MultiplayerTimer : MonoBehaviour
                 && PhotonNetwork.IsMasterClient)
             {
                 _leftTick = _syncEveryTick;
-                Sync();
             }
 
             if (SecondsRemaining > 0)
@@ -52,22 +51,18 @@ public class MultiplayerTimer : MonoBehaviour
         {
             IsRunning = true;
             SecondsRemaining = seconds;
-            Sync();
         }
     }
 
-    public void Sync()
+    public void OnPhotonSerializeView(PhotonStream stream, PhotonMessageInfo info)
     {
-        PhotonView.RPC(nameof(Sync), RpcTarget.AllBufferedViaServer, SecondsRemaining, IsRunning);
-    }
-
-    [PunRPC]
-    private void Sync(float secondsRemaining, bool isRunning)
-    {
-        if (!PhotonNetwork.IsMasterClient)
+        if (stream.IsWriting)
         {
-            SecondsRemaining = secondsRemaining;
-            IsRunning = isRunning;
+            stream.SendNext(SecondsRemaining);
+        }
+        else
+        {
+            SecondsRemaining = (float)stream.ReceiveNext();
         }
     }
 

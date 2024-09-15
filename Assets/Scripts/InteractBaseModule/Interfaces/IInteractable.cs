@@ -13,5 +13,7 @@ public interface IInteractable
     /// Actor data is modified by a calling method.
     /// </summary>
     public bool Interact(InteractActor actor);
+
+    public GameObject GetGameObject { get; }
 }
 

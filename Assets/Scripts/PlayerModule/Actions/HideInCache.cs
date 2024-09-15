@@ -77,6 +77,7 @@ public class HideInCache : MonoBehaviour, IInteractActorAction
 
     public bool IsActionForInteractable(IInteractable interact)
     {
-        return interact is HideCache;
+        return interact is HideCache
+            && interact.GetGameObject.GetComponent<HideCache>().Owner == InteractActor;
     }
 }

@@ -1,5 +1,6 @@
 using Photon.Pun;
 using Photon.Realtime;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
@@ -61,7 +62,6 @@ public class MultiplayerController : MonoBehaviourPunCallbacks
             "SingleTestRoom",
             new RoomOptions()
             {
-                PublishUserId = true
             }
         );
     }
@@ -69,6 +69,9 @@ public class MultiplayerController : MonoBehaviourPunCallbacks
     public override void OnJoinedRoom()
     {
         Debug.Log("PUN Basics Tutorial/Launcher: OnJoinedRoom() called by PUN. Now this client is in a room.");
+
+        PhotonNetwork.LocalPlayer.NickName = "Test Name";
+
         PhotonNetwork.LoadLevel("Game");
     }
 }

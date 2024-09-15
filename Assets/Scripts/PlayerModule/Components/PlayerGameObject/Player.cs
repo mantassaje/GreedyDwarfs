@@ -6,7 +6,6 @@ using UnityEngine;
 
 public class Player : MonoBehaviour
 {
-    public PlayerData PlayerData { get; private set; }
     public PhotonView PhotonView { get; private set; }
     private NotificationText _notificationText;
 
@@ -38,19 +37,5 @@ public class Player : MonoBehaviour
         {
             _notificationText.Notify(message);
         }
-    }
-
-    public void SetPlayerData(PlayerData playerData)
-    {
-        var guid = GuidReferenceHelper.GetId(playerData).ToString();
-        PlayerData = playerData;
-        PhotonView.RPC(nameof(RpcSetPlayerData), RpcTarget.AllBufferedViaServer, guid);
-    }
-
-    [PunRPC]
-    private void RpcSetPlayerData(string guid)
-    {
-        var playerData = GuidReferenceHelper.FindGameObject<PlayerData>(guid);
-        PlayerData = playerData;
     }
 }

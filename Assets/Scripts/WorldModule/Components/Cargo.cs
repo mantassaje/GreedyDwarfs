@@ -5,6 +5,7 @@ public class Cargo : MonoBehaviour, IInteractable
     private Blink Blink { get; set; }
 
     private RulesController RulesController { get; set; }
+    public GameObject GetGameObject => this.gameObject;
 
     void Awake()
     {

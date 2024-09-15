@@ -9,6 +9,7 @@ public class Mineable : MonoBehaviour, IInteractable
 {
     private Blink Blink { get; set; }
     private PhotonView PhotonView { get; set; }
+    public GameObject GetGameObject => this.gameObject;
 
     public int MaxHitsAdd = 5;
     public int MaxGoldAdd = 5;
