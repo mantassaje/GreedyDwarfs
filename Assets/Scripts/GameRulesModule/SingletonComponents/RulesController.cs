@@ -11,6 +11,7 @@ public class RulesController : MonoBehaviour
     public int GoldGoal = 3;
     public bool IsGameOver = false;
     public bool IsGoldCollected = false;
+    public int RemoveCaveInCount = 3;
 
     public float RoundTotalSeconds = 60;
 
@@ -35,7 +36,20 @@ public class RulesController : MonoBehaviour
         if (PhotonNetwork.IsMasterClient)
         {
             GoldGoal = PhotonNetwork.CurrentRoom.PlayerCount * GoldGoalPerPlayer;
+            RemoveCaveIns();
             Sync();
+        }
+    }
+
+    public void RemoveCaveIns()
+    {
+        var caveIns = FindObjectsOfType<Cavein>().ToList();
+
+        for(int i = 0; i < RemoveCaveInCount; i++)
+        {
+            var caveIn = caveIns.PickRandom();
+            caveIns.Remove(caveIn);
+            caveIn.Destroy();
         }
     }
 
