@@ -60,5 +60,9 @@ public class Inventory : MonoBehaviour, IPunObservable
         {
             _hasGold = (bool)stream.ReceiveNext();
         }
+        else
+        {
+            stream.ReceiveNext();
+        }
     }
 }

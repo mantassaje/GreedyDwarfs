@@ -69,5 +69,9 @@ public class Player : MonoBehaviour, IPunObservable
         {
             _areCachesAssigned = (bool)stream.ReceiveNext();
         }
+        else
+        {
+            stream.ReceiveNext();
+        }
     }
 }
