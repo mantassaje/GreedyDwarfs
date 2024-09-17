@@ -95,6 +95,7 @@ public class GoldRushBuff : MonoBehaviour, IPunObservable
         {
             stream.SendNext(IsGoldRushActive);
         }
+        //TODO should have some different time tracking. This might be brittle.
         else
         {
             IsGoldRushActive = (bool)stream.ReceiveNext();

@@ -33,7 +33,7 @@ public class BreakCache : MonoBehaviour, IInteractActorAction
                 return false;
             }
 
-            PhotonView.RPC(nameof(RpcDoBreakCache), RpcTarget.MasterClient, GuidReferenceHelper.GetId(interact).ToString());
+            PhotonView.RPC(nameof(RpcDoBreakCache), RpcTarget.MasterClient, PhotonViewIdHelper.GetId(interact));
 
             return true;
         }
@@ -86,9 +86,9 @@ public class BreakCache : MonoBehaviour, IInteractActorAction
     }
 
     [PunRPC]
-    private void RpcDoBreakCache(string interactGuid)
+    private void RpcDoBreakCache(int interactGuid)
     {
-        var interact = GuidReferenceHelper.FindGameObject(interactGuid);
+        var interact = PhotonViewIdHelper.FindGameObject(interactGuid);
 
         MasterBreakCache(interact);
     }

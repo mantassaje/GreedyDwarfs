@@ -3,7 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Inventory : MonoBehaviour//, IPunObservable
+public class Inventory : MonoBehaviour, IPunObservable
 {
     private bool _hasGold;
     public GameObject HoldVisual;
@@ -50,15 +50,15 @@ public class Inventory : MonoBehaviour//, IPunObservable
         _hasGold = false;
     }
 
-    /*public void OnPhotonSerializeView(PhotonStream stream, PhotonMessageInfo info)
+    public void OnPhotonSerializeView(PhotonStream stream, PhotonMessageInfo info)
     {
         if (stream.IsWriting)
         {
             stream.SendNext(_hasGold);
         }
-        else
+        else if (!PhotonNetwork.IsMasterClient)
         {
             _hasGold = (bool)stream.ReceiveNext();
         }
-    }*/
+    }
 }

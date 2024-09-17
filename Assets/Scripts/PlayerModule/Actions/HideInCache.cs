@@ -28,7 +28,7 @@ public class HideInCache : MonoBehaviour, IInteractActorAction
                 return false;
             }
 
-            PhotonView.RPC(nameof(RpcDoHideInCache), RpcTarget.MasterClient, GuidReferenceHelper.GetId(interact).ToString());
+            PhotonView.RPC(nameof(RpcDoHideInCache), RpcTarget.MasterClient, PhotonViewIdHelper.GetId(interact));
 
             return true;
         }
@@ -68,9 +68,9 @@ public class HideInCache : MonoBehaviour, IInteractActorAction
     }
 
     [PunRPC]
-    private void RpcDoHideInCache(string interactGuid)
+    private void RpcDoHideInCache(int interactGuid)
     {
-        var interact = GuidReferenceHelper.FindGameObject(interactGuid);
+        var interact = PhotonViewIdHelper.FindGameObject(interactGuid);
 
         MasterHideInCache(interact);
     }

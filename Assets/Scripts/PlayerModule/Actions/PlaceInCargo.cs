@@ -28,7 +28,7 @@ public class PlaceInCargo : MonoBehaviour, IInteractActorAction
                 return false;
             }
 
-            PhotonView.RPC(nameof(RpcPlaceInCargo), RpcTarget.MasterClient, GuidReferenceHelper.GetId(interact).ToString());
+            PhotonView.RPC(nameof(RpcPlaceInCargo), RpcTarget.MasterClient, PhotonViewIdHelper.GetId(interact));
 
             return true;
         }
@@ -68,9 +68,9 @@ public class PlaceInCargo : MonoBehaviour, IInteractActorAction
     }
 
     [PunRPC]
-    private void RpcPlaceInCargo(string interactGuid)
+    private void RpcPlaceInCargo(int interactGuid)
     {
-        var interact = GuidReferenceHelper.FindGameObject(interactGuid);
+        var interact = PhotonViewIdHelper.FindGameObject(interactGuid);
 
         MasterPlaceInCargo(interact);
     }

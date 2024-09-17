@@ -47,7 +47,7 @@ public class Mine : MonoBehaviour, IInteractActorAction
                 return false;
             }
 
-            PhotonView.RPC(nameof(RpcMine), RpcTarget.MasterClient, GuidReferenceHelper.GetId(interact).ToString());
+            PhotonView.RPC(nameof(RpcMine), RpcTarget.MasterClient, PhotonViewIdHelper.GetId(interact));
 
             return true;
         }
@@ -110,9 +110,9 @@ public class Mine : MonoBehaviour, IInteractActorAction
     }
 
     [PunRPC]
-    private void RpcMine(string interactGuid)
+    private void RpcMine(int interactGuid)
     {
-        var interact = GuidReferenceHelper.FindGameObject(interactGuid);
+        var interact = PhotonViewIdHelper.FindGameObject(interactGuid);
 
         MasterMine(interact);
     }

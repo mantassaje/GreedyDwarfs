@@ -38,7 +38,7 @@ public class HideCache : MonoBehaviourPunCallbacks, IInteractable, IPunObservabl
             PhotonView.RPC(
                 nameof(RpcSetOwner),
                 RpcTarget.All,
-                GuidReferenceHelper.GetId(owner).ToString()
+                PhotonViewIdHelper.GetId(owner)
             );
         }
     }
@@ -50,20 +50,20 @@ public class HideCache : MonoBehaviourPunCallbacks, IInteractable, IPunObservabl
             PhotonView.RPC(
                 nameof(RpcSetOwner),
                 RpcTarget.All,
-                GuidReferenceHelper.GetId(Owner).ToString()
+                PhotonViewIdHelper.GetId(Owner)
             );
         }
     }
 
     [PunRPC]
-    private void RpcSetOwner(string actorGuid)
+    private void RpcSetOwner(int actorGuid)
     {
         if (Owner != null)
         {
             return;
         }
 
-        var owner = GuidReferenceHelper.FindGameObject<InteractActor>(actorGuid);
+        var owner = PhotonViewIdHelper.FindGameObject<InteractActor>(actorGuid);
 
         Owner = owner;
 

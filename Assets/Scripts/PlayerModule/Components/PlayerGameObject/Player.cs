@@ -65,14 +65,9 @@ public class Player : MonoBehaviour, IPunObservable
         {
             stream.SendNext(_areCachesAssigned);
         }
-        else
+        else if (!PhotonNetwork.IsMasterClient)
         {
-            var areCachesAssigned = (bool)stream.ReceiveNext();
-
-            if (areCachesAssigned)
-            {
-                areCachesAssigned = true;
-            }
+            _areCachesAssigned = (bool)stream.ReceiveNext();
         }
     }
 }
