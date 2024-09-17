@@ -14,7 +14,6 @@ GameObject:
   - component: {fileID: 8523610655411320560}
   - component: {fileID: 4277146191013751594}
   - component: {fileID: 6200826832029157035}
-  - component: {fileID: 6099650407620259063}
   - component: {fileID: 560291038131374560}
   m_Layer: 0
   m_Name: HideCache
@@ -186,23 +185,11 @@ MonoBehaviour:
   Synchronization: 3
   OwnershipTransfer: 0
   observableSearch: 2
-  ObservedComponents: []
+  ObservedComponents:
+  - {fileID: 850759851785632240}
   sceneViewId: 0
   InstantiationId: 0
   isRuntimeInstantiated: 0
---- !u!114 &6099650407620259063
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 850759851785632245}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 0f6d5f3237c2de0458e0fb272abea677, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  DebugIdShow: 
 --- !u!114 &560291038131374560
 MonoBehaviour:
   m_ObjectHideFlags: 0

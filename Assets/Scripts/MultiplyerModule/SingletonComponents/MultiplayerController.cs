@@ -8,7 +8,7 @@ using UnityEngine;
 
 public class MultiplayerController : MonoBehaviourPunCallbacks
 {
-    private string gameVersion = "1";
+    private string gameVersion = "2";
 
     public string Read_IsConnected;
     public string Read_Region;

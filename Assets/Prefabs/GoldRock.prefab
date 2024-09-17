@@ -14,7 +14,6 @@ GameObject:
   - component: {fileID: 7955919695688369205}
   - component: {fileID: 7955919695688369204}
   - component: {fileID: 8286794152662359020}
-  - component: {fileID: 691101863685989262}
   - component: {fileID: 3604227256359391012}
   m_Layer: 0
   m_Name: GoldRock
@@ -198,23 +197,11 @@ MonoBehaviour:
   Synchronization: 3
   OwnershipTransfer: 0
   observableSearch: 2
-  ObservedComponents: []
+  ObservedComponents:
+  - {fileID: 7955919695688369205}
   sceneViewId: 0
   InstantiationId: 0
   isRuntimeInstantiated: 0
---- !u!114 &691101863685989262
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 7955919695688369207}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 0f6d5f3237c2de0458e0fb272abea677, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  DebugIdShow: 
 --- !u!114 &3604227256359391012
 MonoBehaviour:
   m_ObjectHideFlags: 0

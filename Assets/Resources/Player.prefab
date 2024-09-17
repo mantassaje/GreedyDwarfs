@@ -116,7 +116,6 @@ GameObject:
   - component: {fileID: 9168344705679335979}
   - component: {fileID: 3390858743880835334}
   - component: {fileID: 5654421252255606898}
-  - component: {fileID: 2315880561565351073}
   - component: {fileID: 7589954096378780444}
   - component: {fileID: 2074958487531202462}
   m_Layer: 0
@@ -421,10 +420,10 @@ MonoBehaviour:
   observableSearch: 2
   ObservedComponents:
   - {fileID: 6529218830036132020}
+  - {fileID: 125579165849221333}
   - {fileID: 86323740737508378}
   - {fileID: 9168344705679335979}
   - {fileID: 5654421252255606898}
-  - {fileID: 2315880561565351073}
   sceneViewId: 0
   InstantiationId: 0
   isRuntimeInstantiated: 0
@@ -461,19 +460,6 @@ MonoBehaviour:
     InterpolateOption: 0
     InterpolateMoveTowardsSpeed: 1
     InterpolateLerpSpeed: 0
---- !u!114 &2315880561565351073
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 3547743976756337403}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 0f6d5f3237c2de0458e0fb272abea677, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  DebugIdShow: 204784c9-8f6f-459a-9b87-716d24084421
 --- !u!114 &7589954096378780444
 MonoBehaviour:
   m_ObjectHideFlags: 0
