@@ -5,7 +5,7 @@ using UnityEngine;
 
 [RequireComponent(typeof(SpriteRenderer))]
 [RequireComponent(typeof(PhotonView))]
-public class HideCache : MonoBehaviour, IInteractable
+public class HideCache : MonoBehaviourPunCallbacks, IInteractable, IPunObservable
 {
     private Blink Blink;
     public InteractActor Owner;
@@ -33,16 +33,36 @@ public class HideCache : MonoBehaviour, IInteractable
 
     public void SetOwner(InteractActor owner)
     {
-        PhotonView.RPC(
-            nameof(RpcSetOwner), 
-            RpcTarget.AllBufferedViaServer, 
-            GuidReferenceHelper.GetId(owner).ToString()
-        );
+        if (PhotonNetwork.IsMasterClient)
+        {
+            PhotonView.RPC(
+                nameof(RpcSetOwner),
+                RpcTarget.All,
+                GuidReferenceHelper.GetId(owner).ToString()
+            );
+        }
+    }
+
+    public override void OnPlayerEnteredRoom(Photon.Realtime.Player newPlayer)
+    {
+        if (PhotonNetwork.IsMasterClient)
+        {
+            PhotonView.RPC(
+                nameof(RpcSetOwner),
+                RpcTarget.All,
+                GuidReferenceHelper.GetId(Owner).ToString()
+            );
+        }
     }
 
     [PunRPC]
     private void RpcSetOwner(string actorGuid)
     {
+        if (Owner != null)
+        {
+            return;
+        }
+
         var owner = GuidReferenceHelper.FindGameObject<InteractActor>(actorGuid);
 
         Owner = owner;
@@ -77,7 +97,6 @@ public class HideCache : MonoBehaviour, IInteractable
         HiddenGoldCount++;
 
         Blink.BlinkOnce();
-        Sync();
 
         return true;
     }
@@ -92,7 +111,6 @@ public class HideCache : MonoBehaviour, IInteractable
         IsBroken = true;
         HiddenGoldCount = 0;
         DrawBrake();
-        Sync();
 
         return true;
     }
@@ -103,20 +121,25 @@ public class HideCache : MonoBehaviour, IInteractable
         HighlightForOwner.gameObject.SetActive(false);
     }
 
-    private void Sync()
+    public void OnPhotonSerializeView(PhotonStream stream, PhotonMessageInfo info)
     {
-        PhotonView.RPC(nameof(RpcSync), RpcTarget.AllBufferedViaServer, HiddenGoldCount, IsBroken);
-    }
-
-    [PunRPC]
-    private void RpcSync(int hiddenGoldCount, bool isBroken)
-    {
-        HiddenGoldCount = hiddenGoldCount;
-        IsBroken = isBroken;
-
-        if (isBroken)
+        if (stream.IsWriting)
         {
-            DrawBrake();
+            stream.SendNext(HiddenGoldCount);
+            stream.SendNext(IsBroken);
+        }
+        else
+        {
+            HiddenGoldCount = (int)stream.ReceiveNext();
+            var isBrokenNew = (bool)stream.ReceiveNext();
+
+            if (!IsBroken
+                && isBrokenNew)
+            {
+                DrawBrake();
+            }
+
+            IsBroken = isBrokenNew;
         }
     }
 }

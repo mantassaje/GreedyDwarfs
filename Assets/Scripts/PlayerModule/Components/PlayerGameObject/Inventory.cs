@@ -3,7 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Inventory : MonoBehaviour
+public class Inventory : MonoBehaviour//, IPunObservable
 {
     private bool _hasGold;
     public GameObject HoldVisual;
@@ -25,7 +25,7 @@ public class Inventory : MonoBehaviour
         if (PhotonNetwork.IsMasterClient)
         {
             _hasGold = true;
-            PhotonView.RPC(nameof(RcpAddGold), RpcTarget.AllBufferedViaServer);
+            PhotonView.RPC(nameof(RcpAddGold), RpcTarget.Others);
         }
     }
 
@@ -34,7 +34,7 @@ public class Inventory : MonoBehaviour
         if (PhotonNetwork.IsMasterClient)
         {
             _hasGold = false;
-            PhotonView.RPC(nameof(RpcRemoveGold), RpcTarget.AllBufferedViaServer);
+            PhotonView.RPC(nameof(RpcRemoveGold), RpcTarget.Others);
         }
     }
 
@@ -49,4 +49,16 @@ public class Inventory : MonoBehaviour
     {
         _hasGold = false;
     }
+
+    /*public void OnPhotonSerializeView(PhotonStream stream, PhotonMessageInfo info)
+    {
+        if (stream.IsWriting)
+        {
+            stream.SendNext(_hasGold);
+        }
+        else
+        {
+            _hasGold = (bool)stream.ReceiveNext();
+        }
+    }*/
 }

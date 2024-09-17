@@ -4,7 +4,7 @@ using UnityEngine;
 using UnityEngine.SceneManagement;
 
 [RequireComponent(typeof(PhotonView))]
-public class RulesController : MonoBehaviour
+public class RulesController : MonoBehaviour, IPunObservable
 {
     public int GoldCount;
     public int GoldGoalPerPlayer = 3;
@@ -37,7 +37,6 @@ public class RulesController : MonoBehaviour
         {
             GoldGoal = PhotonNetwork.CurrentRoom.PlayerCount * GoldGoalPerPlayer;
             RemoveCaveIns();
-            Sync();
         }
     }
 
@@ -64,8 +63,6 @@ public class RulesController : MonoBehaviour
                 SetGameOverGoalSuccessScores();
                 SetEndGame();
             }
-
-            Sync();
         }
     }
 
@@ -80,7 +77,6 @@ public class RulesController : MonoBehaviour
         {
             SetGameOverEndTimeScores();
             SetEndGame();
-            Sync();
         }
     }
 
@@ -129,8 +125,6 @@ public class RulesController : MonoBehaviour
                     player.AddToTotalScoreRound = 5;
                 }
             }
-
-            ScoreSheetController.SyncAll();
         }
     }
 
@@ -173,8 +167,6 @@ public class RulesController : MonoBehaviour
                     player.AddToTotalScoreRound = 1;
                 }
             }
-
-            ScoreSheetController.SyncAll();
         }
     }
 
@@ -212,17 +204,21 @@ public class RulesController : MonoBehaviour
         }
     }
 
-    private void Sync()
+    public void OnPhotonSerializeView(PhotonStream stream, PhotonMessageInfo info)
     {
-        PhotonView.RPC(nameof(RpcSync), RpcTarget.AllBufferedViaServer, GoldGoal, GoldCount, IsGameOver, IsGoldCollected);
-    }
-
-    [PunRPC]
-    private void RpcSync(int goldGoal, int goldCount, bool isGameOver, bool isGoldCollected)
-    {
-        GoldGoal = goldGoal;
-        GoldCount = goldCount;
-        IsGameOver = isGameOver;
-        IsGoldCollected = isGoldCollected;
+        if (stream.IsWriting)
+        {
+            stream.SendNext(GoldGoal);
+            stream.SendNext(GoldCount);
+            stream.SendNext(IsGameOver);
+            stream.SendNext(IsGoldCollected);
+        }
+        else
+        {
+            GoldGoal = (int)stream.ReceiveNext();
+            GoldCount = (int)stream.ReceiveNext();
+            IsGameOver = (bool)stream.ReceiveNext();
+            IsGoldCollected = (bool)stream.ReceiveNext();
+        }
     }
 }

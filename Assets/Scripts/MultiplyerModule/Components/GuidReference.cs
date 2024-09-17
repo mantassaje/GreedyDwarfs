@@ -3,7 +3,7 @@ using System;
 using UnityEngine;
 
 [RequireComponent(typeof(PhotonView))]
-public class GuidReference : MonoBehaviourPunCallbacks
+public class GuidReference : MonoBehaviourPunCallbacks, IPunObservable
 {
     public Guid Id { get; private set; }
 
@@ -15,6 +15,15 @@ public class GuidReference : MonoBehaviourPunCallbacks
     public GuidReference()
     {
         
+    }
+
+    private void Update()
+    {
+        //Would be good to log empty guids but for clieants later when the guids are sent.
+        /*if (Id == Guid.Empty)
+        {
+            Debug.LogError($"Guid is {Id}.", this);
+        }*/
     }
 
     private void Awake()
@@ -46,5 +55,26 @@ public class GuidReference : MonoBehaviourPunCallbacks
     {
         Id = new Guid(guidId);
         DebugIdShow = Id.ToString();
+    }
+
+    public void OnPhotonSerializeView(PhotonStream stream, PhotonMessageInfo info)
+    {
+        if (stream.IsWriting)
+        {
+            stream.SendNext(Id.ToString());
+        }
+        else
+        {
+            var id = (string)stream.ReceiveNext();
+
+            if (id == Guid.Empty.ToString())
+            {
+                return;
+            }
+
+            Id = new Guid(id);
+
+            DebugIdShow = id;
+        }
     }
 }

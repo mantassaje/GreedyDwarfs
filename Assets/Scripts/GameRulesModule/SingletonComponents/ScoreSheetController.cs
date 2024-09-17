@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 
-public class ScoreSheetController : MonoBehaviourPunCallbacks
+public class ScoreSheetController : MonoBehaviourPunCallbacks, IPunObservable
 {
     public class ActorScoreSheet
     {
@@ -31,75 +31,26 @@ public class ScoreSheetController : MonoBehaviourPunCallbacks
             {
                 sheet.Value.AddToTotalScoreRound = 0;
                 sheet.Value.TotalStolenLootRound = 0;
-
-                PhotonView.RPC(nameof(RpcUpdateScoreSheet), RpcTarget.AllBufferedViaServer, sheet.Value.ActorNumber, sheet.Value.TotalScore, 0, 0);
             }
         }
-    }
-
-    public void SyncAll()
-    {
-        if (PhotonNetwork.IsMasterClient)
-        {
-            foreach (var sheet in ActorScoreSheets)
-            {
-                PhotonView.RPC(
-                    nameof(RpcUpdateScoreSheet), 
-                    RpcTarget.AllBufferedViaServer,
-                    sheet.Value.ActorNumber,
-                    sheet.Value.TotalScore,
-                    sheet.Value.AddToTotalScoreRound,
-                    sheet.Value.TotalStolenLootRound
-                );
-            }
-        }
-    }
-
-    public void UpdateScoreSheet(Photon.Realtime.Player player, int totalScore, int addToTotalScoreRound, int totalStolenLootRound)
-    {
-        if (PhotonNetwork.IsMasterClient)
-        {
-            PhotonView.RPC(nameof(RpcUpdateScoreSheet), RpcTarget.AllBufferedViaServer, player.ActorNumber, totalScore, addToTotalScoreRound, totalStolenLootRound);
-
-            RefreshActorScoreSheet(player.ActorNumber, totalScore, addToTotalScoreRound, totalStolenLootRound);
-        }
-    }
-
-    [PunRPC]
-    private void RpcUpdateScoreSheet(int actorNumber, int totalScore, int addToTotalScoreRound, int totalStolenLootRound)
-    {
-        RefreshActorScoreSheet(actorNumber, totalScore, addToTotalScoreRound, totalStolenLootRound);
     }
 
     public void RemoveSheet(Photon.Realtime.Player player)
     {
         if (PhotonNetwork.IsMasterClient)
         {
-            PhotonView.RPC(nameof(RpcRemoveSheet), RpcTarget.AllBufferedViaServer, player.ActorNumber);
+            ActorScoreSheets.TryGetValue(player.ActorNumber, out var sheet);
 
-            CommitRemove(player.ActorNumber);
+            if (sheet != null)
+            {
+                ActorScoreSheets.Remove(player.ActorNumber);
+            }
         }
     }
 
-    [PunRPC]
-    private void RpcRemoveSheet(int actorNumber)
+    public void UpdateScoreSheet(Photon.Realtime.Player player, int totalScore, int addToTotalScoreRound, int totalStolenLootRound)
     {
-        CommitRemove(actorNumber);
-    }
-
-    private void CommitRemove(int actorNumber)
-    {
-        ActorScoreSheets.TryGetValue(actorNumber, out var sheet);
-
-        if (sheet != null)
-        {
-            ActorScoreSheets.Remove(actorNumber);
-        }
-    }
-
-    private void RefreshActorScoreSheet(int actorNumber, int totalScore, int addToTotalScoreRound, int totalStolenLootRound)
-    {
-        ActorScoreSheets.TryGetValue(actorNumber, out var sheet);
+        ActorScoreSheets.TryGetValue(player.ActorNumber, out var sheet);
 
         if (sheet != null)
         {
@@ -109,13 +60,46 @@ public class ScoreSheetController : MonoBehaviourPunCallbacks
         }
         else
         {
-            ActorScoreSheets[actorNumber] = new ActorScoreSheet()
+            ActorScoreSheets[player.ActorNumber] = new ActorScoreSheet()
             {
-                ActorNumber = actorNumber,
+                ActorNumber = player.ActorNumber,
                 TotalScore = totalScore,
                 AddToTotalScoreRound = addToTotalScoreRound,
                 TotalStolenLootRound = totalStolenLootRound
             };
+        }
+    }
+
+    public void OnPhotonSerializeView(PhotonStream stream, PhotonMessageInfo info)
+    {
+        if (stream.IsWriting)
+        {
+            stream.SendNext(ActorScoreSheets.Count);
+
+            foreach(var sheet in ActorScoreSheets.Values)
+            {
+                stream.SendNext(sheet.ActorNumber);
+                stream.SendNext(sheet.AddToTotalScoreRound);
+                stream.SendNext(sheet.TotalScore);
+                stream.SendNext(sheet.TotalStolenLootRound);
+            }
+        }
+        else
+        {
+            var count = (int)stream.ReceiveNext();
+
+            ActorScoreSheets = new Dictionary<int, ActorScoreSheet>();
+
+            for (int i = 0; i < count; i++)
+            {
+                var sheet = new ActorScoreSheet();
+                sheet.ActorNumber = (int)stream.ReceiveNext();
+                sheet.AddToTotalScoreRound = (int)stream.ReceiveNext();
+                sheet.TotalScore = (int)stream.ReceiveNext();
+                sheet.TotalStolenLootRound = (int)stream.ReceiveNext();
+
+                ActorScoreSheets[sheet.ActorNumber] = sheet;
+            }
         }
     }
 

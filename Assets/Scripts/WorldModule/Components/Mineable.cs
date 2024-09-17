@@ -4,11 +4,12 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-[RequireComponent(typeof(Blink))]
-public class Mineable : MonoBehaviour, IInteractable
+public class Mineable : MonoBehaviour, IInteractable, IPunObservable
 {
     private Blink Blink { get; set; }
     private PhotonView PhotonView { get; set; }
+    private SpriteRenderer SpriteRenderer { get; set; }
+    private Collider2D Collider2D { get; set; }
     public GameObject GetGameObject => this.gameObject;
 
     public int MaxHitsAdd = 5;
@@ -16,16 +17,15 @@ public class Mineable : MonoBehaviour, IInteractable
     public int MinHits = 3;
     public int MinGold = 3;
 
-    //[ReadOnly]
     public int GoldCount;
-
-    //[ReadOnly]
     public int HitCountLeft;
 
     void Awake()
     {
         Blink = GetComponent<Blink>();
         PhotonView = GetComponent<PhotonView>();
+        SpriteRenderer = GetComponent<SpriteRenderer>();
+        Collider2D = GetComponent<Collider2D>();
 
         GoldCount = UnityEngine.Random.Range(1, MaxGoldAdd + 1) + MinGold;
         GenerateHits();
@@ -38,17 +38,38 @@ public class Mineable : MonoBehaviour, IInteractable
 
     private void ConsumeGold()
     {
-        GoldCount--;
-        GenerateHits();
-
-        if (GoldCount <= 0)
+        if (PhotonNetwork.IsMasterClient)
         {
-            gameObject.SetActive(false);
+            GoldCount--;
+            GenerateHits();
+        }
+    }
+
+    private void Update()
+    {
+        var isMined = GoldCount <= 0;
+
+        if (isMined
+            && SpriteRenderer != null
+            && SpriteRenderer.enabled)
+        {
+            Destroy(Blink);
+            Destroy(SpriteRenderer);
+            Destroy(Collider2D);
+
+            Blink = null;
+            SpriteRenderer = null;
+            Collider2D = null;
         }
     }
 
     public bool Interact(InteractActor actor)
     {
+        if (GoldCount <= 0)
+        {
+            return false;
+        }
+
         Blink.BlinkOnce();
 
         HitCountLeft--;
@@ -56,30 +77,25 @@ public class Mineable : MonoBehaviour, IInteractable
         if (HitCountLeft <= 0)
         {
             ConsumeGold();
-            Sync();
             return true;
         }
         else
         {
-            Sync();
             return false;
         }
     }
 
-    public void Sync()
+    public void OnPhotonSerializeView(PhotonStream stream, PhotonMessageInfo info)
     {
-        PhotonView.RPC(nameof(RpcSync), RpcTarget.AllBufferedViaServer, GoldCount, HitCountLeft);
-    }
-
-    [PunRPC]
-    private void RpcSync(int goldCount, int hitCount)
-    {
-        GoldCount = goldCount;
-        HitCountLeft = hitCount;
-
-        if (GoldCount <= 0)
+        if (stream.IsWriting)
         {
-            gameObject.SetActive(false);
+            stream.SendNext(GoldCount);
+            stream.SendNext(HitCountLeft);
+        }
+        else
+        {
+            GoldCount = (int)stream.ReceiveNext();
+            HitCountLeft = (int)stream.ReceiveNext();
         }
     }
 }

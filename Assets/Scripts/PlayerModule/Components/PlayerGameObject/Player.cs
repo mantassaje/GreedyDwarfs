@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 
-public class Player : MonoBehaviour
+public class Player : MonoBehaviour, IPunObservable
 {
     public PhotonView PhotonView { get; private set; }
     private NotificationText _notificationText;
@@ -29,17 +29,18 @@ public class Player : MonoBehaviour
         {
             FindObjectOfType<RulesController>().SetHiddenCacheOwner(GetComponent<InteractActor>());
             _areCachesAssigned = true;
-            Sync();
+            SetInitFlags();
         }
     }
 
-    public void Sync()
+    public void SetInitFlags()
     {
-        PhotonView.RPC(nameof(RpcSync), RpcTarget.AllBufferedViaServer, _areCachesAssigned);
+        // This should be AllBufferedViaServer.
+        PhotonView.RPC(nameof(RpcSetInitFlags), RpcTarget.All, _areCachesAssigned);
     }
 
     [PunRPC]
-    private void RpcSync(bool areCachesAssigned)
+    private void RpcSetInitFlags(bool areCachesAssigned)
     {
         _areCachesAssigned = areCachesAssigned;
     }
@@ -55,6 +56,23 @@ public class Player : MonoBehaviour
         if (PhotonView.IsMine)
         {
             _notificationText.Notify(message);
+        }
+    }
+
+    public void OnPhotonSerializeView(PhotonStream stream, PhotonMessageInfo info)
+    {
+        if (stream.IsWriting)
+        {
+            stream.SendNext(_areCachesAssigned);
+        }
+        else
+        {
+            var areCachesAssigned = (bool)stream.ReceiveNext();
+
+            if (areCachesAssigned)
+            {
+                areCachesAssigned = true;
+            }
         }
     }
 }
