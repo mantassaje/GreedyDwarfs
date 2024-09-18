@@ -484,7 +484,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e87b591a6e1612b4f94e68054cc1375b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  TotalCooldownSeconds: 30
+  TotalCooldownSeconds: 40
   CooldownTimer: {fileID: 6512764912517400023}
 --- !u!1 &4774438102310544459
 GameObject:

@@ -47,11 +47,14 @@ public class HideCache : MonoBehaviourPunCallbacks, IInteractable, IPunObservabl
     {
         if (PhotonNetwork.IsMasterClient)
         {
-            PhotonView.RPC(
-                nameof(RpcSetOwner),
-                RpcTarget.All,
-                PhotonViewIdHelper.GetId(Owner)
-            );
+            if (Owner != null)
+            {
+                PhotonView.RPC(
+                    nameof(RpcSetOwner),
+                    RpcTarget.All,
+                    PhotonViewIdHelper.GetId(Owner)
+                );
+            }
         }
     }
 

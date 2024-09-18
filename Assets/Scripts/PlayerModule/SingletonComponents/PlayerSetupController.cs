@@ -10,16 +10,12 @@ public class PlayerSetupController : MonoBehaviour
 
     private GameObject _localPlayer;
 
-    private void Awake()
+    void OnLevelWasLoaded(int level)
     {
-        if (FindObjectOfType<MultiplayerController>() == null)
-        {
-            SceneManager.LoadScene("Setup");
-            return;
-        }
+        Invoke(nameof(InitPlayer), 1f);
     }
 
-    void Start()
+    public void InitPlayer()
     {
         var spwanPoint = FindObjectsOfType<SpwanPoint>().ToList().PickRandom();
 

@@ -13,6 +13,9 @@ public class ReloadController : MonoBehaviour
 
     private void Reload()
     {
-        PhotonNetwork.LoadLevel("Game");
+        if (PhotonNetwork.IsMasterClient)
+        {
+            PhotonNetwork.LoadLevel("Game");
+        }
     }
 }

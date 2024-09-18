@@ -56,6 +56,9 @@ public class MultiplayerController : MonoBehaviourPunCallbacks
     {
         Debug.Log("PUN Basics Tutorial/Launcher: OnJoinedRoom() called by PUN. Now this client is in a room.");
 
-        PhotonNetwork.LoadLevel("Game");
+        if (PhotonNetwork.IsMasterClient)
+        {
+            PhotonNetwork.LoadLevel("Game");
+        }
     }
 }

@@ -44,9 +44,13 @@ public class Cavein : MonoBehaviour, IPunObservable
         {
             stream.SendNext(_isClear);
         }
-        else
+        else if (!PhotonNetwork.IsMasterClient)
         {
             _isClear = (bool)stream.ReceiveNext();
+        }
+        else
+        {
+            stream.ReceiveNext();
         }
     }
 }

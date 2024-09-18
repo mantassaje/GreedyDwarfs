@@ -93,7 +93,6 @@ public class RulesController : MonoBehaviour, IPunObservable
         if (PhotonNetwork.IsMasterClient)
         {
             Debug.Log("ReloadScene called.");
-            var scene = SceneManager.GetActiveScene();
             PhotonNetwork.LoadLevel("Reload");
         }
     }

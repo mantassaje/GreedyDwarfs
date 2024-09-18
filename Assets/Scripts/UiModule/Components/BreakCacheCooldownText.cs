@@ -11,14 +11,19 @@ public class BreakCacheCooldownText : MonoBehaviour
 
     void Start()
     {
-        _breakCacheAction = FindObjectsOfType<BreakCache>().First(action => action.PhotonView.IsMine);
-
         Text = GetComponent<TMP_Text>();
     }
 
     // Update is called once per frame
     void Update()
     {
+        if (_breakCacheAction == null)
+        {
+            Text.text = "";
+            _breakCacheAction = FindObjectsOfType<BreakCache>().FirstOrDefault(action => action.PhotonView.IsMine);
+            return;
+        }
+
         if (_breakCacheAction.CooldownTimer.IsRunning)
         {
             float seconds = Mathf.FloorToInt(_breakCacheAction.CooldownTimer.SecondsRemaining);
