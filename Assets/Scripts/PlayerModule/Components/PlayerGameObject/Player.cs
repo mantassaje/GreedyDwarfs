@@ -45,17 +45,17 @@ public class Player : MonoBehaviour, IPunObservable
         _areCachesAssigned = areCachesAssigned;
     }
 
-    public void Notify(string message)
+    public void Notify(string message, bool doOverwrite)
     {
-        PhotonView.RPC(nameof(RpcNotify), RpcTarget.All, message);
+        PhotonView.RPC(nameof(RpcNotify), RpcTarget.All, message, doOverwrite);
     }
 
     [PunRPC]
-    private void RpcNotify(string message)
+    private void RpcNotify(string message, bool doOverwrite)
     {
         if (PhotonView.IsMine)
         {
-            _notificationText.Notify(message);
+            _notificationText.Notify(message, doOverwrite);
         }
     }
 

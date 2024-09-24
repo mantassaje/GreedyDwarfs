@@ -14,8 +14,13 @@ public class NotificationText : MonoBehaviour
         Text.text = null;
     }
 
-    public void Notify(string message)
+    public void Notify(string message, bool doOverwrite)
     {
+        if (!doOverwrite && !string.IsNullOrWhiteSpace(Text.text))
+        {
+            return;
+        }
+
         Text.text = message;
         CancelInvoke();
         Invoke(nameof(HideMessage), 5f);

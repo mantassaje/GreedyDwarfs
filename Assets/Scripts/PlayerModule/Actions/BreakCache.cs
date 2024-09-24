@@ -30,6 +30,11 @@ public class BreakCache : MonoBehaviour, IInteractActorAction
         {
             if (!IsValidAction(interact))
             {
+                if (CooldownTimer.IsRunning)
+                {
+                    Player.Notify("Wait for cooldown", false);
+                }
+
                 return false;
             }
 
@@ -60,6 +65,11 @@ public class BreakCache : MonoBehaviour, IInteractActorAction
     {
         if (!IsValidAction(interact))
         {
+            if (CooldownTimer.IsRunning)
+            {
+                Player.Notify("Wait for cooldown", false);
+            }
+
             return false;
         }
 
@@ -70,13 +80,14 @@ public class BreakCache : MonoBehaviour, IInteractActorAction
             var hideCache = interact.GetComponent<HideCache>();
             if (hideCache.IsBroken)
             {
-                Player.Notify("You found stolen loot!");
-                hideCache.Owner.Player.Notify("Your stolen loot was found!");
+                Player.Notify("You found stolen loot!", true);
+                //Null checked in case player left mid game.
+                hideCache.Owner?.Player?.Notify("Your stolen loot was found!", true);
                 Inventory.AddGold();
             }
             else
             {
-                Player.Notify("Nothing found");
+                Player.Notify("Nothing found", true);
             }
 
             return true;
