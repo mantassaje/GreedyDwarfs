@@ -21420,7 +21420,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   MinPlayers: 3
-  BreakPercent: 25
+  BreakPercent: 30
 --- !u!114 &1284534069
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -21434,7 +21434,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   MinPlayers: 2
-  BreakPercent: 25
+  BreakPercent: 35
 --- !u!4 &1284534070
 Transform:
   m_ObjectHideFlags: 0
