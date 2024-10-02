@@ -5,7 +5,7 @@ using UnityEngine;
 public class BreakCache : MonoBehaviour, IInteractActorAction
 {
     public Inventory Inventory { get; private set; }
-    public Player Player { get; private set; }
+    public PlayerToken Player { get; private set; }
     public InteractActor InteractActor { get; private set; }
     public PhotonView PhotonView { get; private set; }
 
@@ -15,7 +15,7 @@ public class BreakCache : MonoBehaviour, IInteractActorAction
     void Awake()
     {
         Inventory = GetComponent<Inventory>();
-        Player = GetComponent<Player>();
+        Player = GetComponent<PlayerToken>();
         InteractActor = GetComponent<InteractActor>();
         PhotonView = GetComponent<PhotonView>();
     }

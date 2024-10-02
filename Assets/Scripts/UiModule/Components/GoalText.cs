@@ -17,6 +17,6 @@ public class GoalText : MonoBehaviour
 
     private void Update()
     {
-        Text.text = $"Quota gold is {_ruleController.GoldGoal}      Collected {_ruleController.GoldCount}";
+        Text.text = $"Quota gold is {_ruleController.GoldGoal}      Team collected {_ruleController.GoldCount}";
     }
 }

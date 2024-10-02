@@ -12,6 +12,7 @@ public class ScoreSheetController : MonoBehaviourPunCallbacks, IPunObservable
         public int TotalScore { get; set; }
         public int AddToTotalScoreRound { get; set; }
         public int TotalStolenLootRound { get; set; }
+        public int TotalGoldCollectedRound { get; set; }
     }
 
     public PhotonView PhotonView { get; private set; }
@@ -21,18 +22,6 @@ public class ScoreSheetController : MonoBehaviourPunCallbacks, IPunObservable
     {
         DontDestroyOnLoad(gameObject);
         PhotonView = GetComponent<PhotonView>();
-    }
-
-    public void ResetRoundData()
-    {
-        if (PhotonNetwork.IsMasterClient)
-        {
-            foreach (var sheet in ActorScoreSheets)
-            {
-                sheet.Value.AddToTotalScoreRound = 0;
-                sheet.Value.TotalStolenLootRound = 0;
-            }
-        }
     }
 
     public void RemoveSheet(Photon.Realtime.Player player)
@@ -70,6 +59,21 @@ public class ScoreSheetController : MonoBehaviourPunCallbacks, IPunObservable
         }
     }
 
+    public List<Photon.Realtime.Player> GetHighScorePlayers()
+    {
+        var scoreGroups = ActorScoreSheets.Values
+            .GroupBy(sheet => sheet.TotalScore)
+            .OrderByDescending(sheets => sheets.Key);
+
+        return scoreGroups
+            .FirstOrDefault()
+            .Select(sheet => PhotonNetwork.CurrentRoom.Players.ContainsKey(sheet.ActorNumber)
+                ? PhotonNetwork.CurrentRoom.Players[sheet.ActorNumber]
+                : null)
+            .Where(player => player != null)
+            .ToList();
+    }
+
     public void OnPhotonSerializeView(PhotonStream stream, PhotonMessageInfo info)
     {
         if (stream.IsWriting)
@@ -82,6 +86,7 @@ public class ScoreSheetController : MonoBehaviourPunCallbacks, IPunObservable
                 stream.SendNext(sheet.AddToTotalScoreRound);
                 stream.SendNext(sheet.TotalScore);
                 stream.SendNext(sheet.TotalStolenLootRound);
+                stream.SendNext(sheet.TotalGoldCollectedRound);
             }
         }
         else
@@ -97,6 +102,7 @@ public class ScoreSheetController : MonoBehaviourPunCallbacks, IPunObservable
                 sheet.AddToTotalScoreRound = (int)stream.ReceiveNext();
                 sheet.TotalScore = (int)stream.ReceiveNext();
                 sheet.TotalStolenLootRound = (int)stream.ReceiveNext();
+                sheet.TotalGoldCollectedRound = (int)stream.ReceiveNext();
 
                 ActorScoreSheets[sheet.ActorNumber] = sheet;
             }

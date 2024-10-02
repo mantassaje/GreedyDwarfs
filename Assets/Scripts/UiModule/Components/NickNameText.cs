@@ -8,7 +8,7 @@ using UnityEngine;
 public class NickNameText : MonoBehaviour
 {
     public TMP_Text Text { get; private set; }
-    public Player Player;
+    public PlayerToken Player;
 
     // Start is called before the first frame update
     void Start()

@@ -61,7 +61,7 @@ public class HideInCache : MonoBehaviour, IInteractActorAction
         if (interact.GetComponent<IInteractable>().Interact(InteractActor))
         {
             Inventory.RemoveGold();
-            GetComponent<Player>().Notify("You hid your loot", false);
+            GetComponent<PlayerToken>().Notify("You hid your loot", false);
             return true;
         }
 

@@ -1,14 +1,12 @@
 using Photon.Pun;
-using System.Collections;
-using System.Collections.Generic;
-using System.Linq;
 using UnityEngine;
 
-public class Player : MonoBehaviour, IPunObservable
+public class PlayerToken : MonoBehaviour, IPunObservable
 {
     public PhotonView PhotonView { get; private set; }
     private NotificationText _notificationText;
     private bool _areCachesAssigned = false;
+    public int TotalGoldCollected;
 
     private void Awake()
     {
@@ -64,10 +62,12 @@ public class Player : MonoBehaviour, IPunObservable
         if (stream.IsWriting)
         {
             stream.SendNext(_areCachesAssigned);
+            stream.SendNext(TotalGoldCollected);
         }
         else if (!PhotonNetwork.IsMasterClient)
         {
             _areCachesAssigned = (bool)stream.ReceiveNext();
+            TotalGoldCollected = (int)stream.ReceiveNext();
         }
         else
         {

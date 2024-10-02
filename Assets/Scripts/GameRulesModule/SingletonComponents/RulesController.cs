@@ -1,4 +1,8 @@
+using Assets.Scripts.GameRulesModule.ScoreHandlers;
+using Assets.Scripts.GameRulesModule.ScoreHandlers.Interfaces;
+using Assets.Scripts.GameRulesModule.ScoreHandlers.Special;
 using Photon.Pun;
+using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 using UnityEngine.SceneManagement;
@@ -22,6 +26,8 @@ public class RulesController : MonoBehaviour, IPunObservable
     public PhotonView PhotonView { get; private set; }
     public ScoreSheetController ScoreSheetController { get; private set; }
 
+    private List<IScoreHandler> ScoreHandlers;
+
     private void Awake()
     {
         PhotonView = GetComponent<PhotonView>();
@@ -38,6 +44,21 @@ public class RulesController : MonoBehaviour, IPunObservable
             GoldGoal = PhotonNetwork.CurrentRoom.PlayerCount * GoldGoalPerPlayer;
             RemoveCaveIns();
         }
+
+        ScoreHandlers = new List<IScoreHandler>()
+        {
+            // Setup
+            new ResetScoreHandler(),
+            new CollectCountsScoreHandler(),
+
+            // Score logic
+            new GoldCollectedAllScoreHandler(),
+            new TopThiefScoreHandler(),
+            new TopWorkerScoreHandler(),
+
+            // Commit
+            new CommitTotalScoreHandler()
+        };
     }
 
     public void RemoveCaveIns()
@@ -64,11 +85,6 @@ public class RulesController : MonoBehaviour, IPunObservable
                 SetEndGame();
             }
         }
-    }
-
-    private void CheckGameOver()
-    {
-        
     }
 
     private void EndTime()
@@ -106,24 +122,7 @@ public class RulesController : MonoBehaviour, IPunObservable
             && !IsGameOver)
         {
             IsGoldCollected = false;
-
-            SetStolenLoot();
-
-            if (!ScoreSheetController.ActorScoreSheets.Values.All(sheet => sheet.TotalStolenLootRound == 0))
-            {
-                var sortedGroup = ScoreSheetController.ActorScoreSheets.Values
-                .Where(player => player.TotalStolenLootRound > 0)
-                .GroupBy(player => player.TotalStolenLootRound)
-                .OrderByDescending(group => group.Key);
-
-                var topPlayersGroup = sortedGroup.First().ToList();
-
-                foreach (var player in topPlayersGroup)
-                {
-                    player.TotalScore += 5;
-                    player.AddToTotalScoreRound = 5;
-                }
-            }
+            CalculateScore();
         }
     }
 
@@ -133,57 +132,15 @@ public class RulesController : MonoBehaviour, IPunObservable
             && !IsGameOver)
         {
             IsGoldCollected = true;
-
-            SetStolenLoot();
-
-            var players = ScoreSheetController.ActorScoreSheets.Values.ToList();
-
-            var sortedGroup = players
-                .GroupBy(player => player.TotalStolenLootRound)
-                .OrderByDescending(group => group.Key);
-
-            if (sortedGroup.Count() == 0)
-            {
-                return;
-            }
-
-            var topPlayersGroup = sortedGroup.First().ToList();
-            var bottomPlayersGroup = sortedGroup.Last().ToList();
-
-            var midPlayers = players.Except(topPlayersGroup).Except(bottomPlayersGroup);
-
-            foreach (var player in topPlayersGroup)
-            {
-                player.TotalScore += 2;
-                player.AddToTotalScoreRound = 2;
-            }
-
-            foreach (var player in midPlayers)
-            {
-                if (player.AddToTotalScoreRound == 0)
-                {
-                    player.TotalScore += 1;
-                    player.AddToTotalScoreRound = 1;
-                }
-            }
+            CalculateScore();
         }
     }
 
-    private void SetStolenLoot()
+    private void CalculateScore()
     {
-        ScoreSheetController.ResetRoundData();
-
-        var caches = FindObjectsOfType<HideCache>();
-
-        foreach(var cache in caches)
+        foreach(var handler in ScoreHandlers)
         {
-            if (cache.Owner != null
-                && !cache.IsBroken)
-            {
-                var stolenGold = cache.HiddenGoldCount;
-
-                ScoreSheetController.ActorScoreSheets[cache.Owner.Player.PhotonView.Owner.ActorNumber].TotalStolenLootRound += stolenGold;
-            }
+            handler.SetScores(ScoreSheetController);
         }
     }
 

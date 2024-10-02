@@ -10,9 +10,9 @@ public class PlayerSetupController : MonoBehaviour
 
     private GameObject _localPlayer;
 
-    void OnLevelWasLoaded(int level)
+    void Start()
     {
-        Invoke(nameof(InitPlayer), 1f);
+        Invoke(nameof(InitPlayer), 2f);
     }
 
     public void InitPlayer()

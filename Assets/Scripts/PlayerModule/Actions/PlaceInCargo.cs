@@ -6,12 +6,14 @@ public class PlaceInCargo : MonoBehaviour, IInteractActorAction
 {
     public Inventory Inventory { get; private set; }
     public InteractActor InteractActor { get; private set; }
+    public PlayerToken PlayerToken { get; private set; }
     public PhotonView PhotonView { get; private set; }
 
     void Awake()
     {
         Inventory = GetComponent<Inventory>();
         InteractActor = GetComponent<InteractActor>();
+        PlayerToken = GetComponent<PlayerToken>();
         PhotonView = GetComponent<PhotonView>();
     }
 
@@ -61,7 +63,8 @@ public class PlaceInCargo : MonoBehaviour, IInteractActorAction
         if (interact.GetComponent<IInteractable>().Interact(InteractActor))
         {
             Inventory.RemoveGold();
-            GetComponent<Player>().Notify("Item loaded into cargo wagon", false);
+            PlayerToken.TotalGoldCollected++;
+            GetComponent<PlayerToken>().Notify("Item loaded into cargo wagon", false);
             return true;
         }
 
