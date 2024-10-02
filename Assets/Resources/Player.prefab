@@ -402,6 +402,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8c7c1cb062330af4ca49b46c576b4c06, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  TotalGoldCollected: 0
 --- !u!114 &3390858743880835334
 MonoBehaviour:
   m_ObjectHideFlags: 0

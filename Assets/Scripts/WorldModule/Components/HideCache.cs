@@ -111,11 +111,16 @@ public class HideCache : MonoBehaviourPunCallbacks, IInteractable, IPunObservabl
             return true;
         }
 
+        ForceBreak();
+
+        return true;
+    }
+
+    public void ForceBreak()
+    {
         IsBroken = true;
         HiddenGoldCount = 0;
         DrawBrake();
-
-        return true;
     }
 
     private void DrawBrake()

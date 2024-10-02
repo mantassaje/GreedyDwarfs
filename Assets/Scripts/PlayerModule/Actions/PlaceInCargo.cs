@@ -63,7 +63,6 @@ public class PlaceInCargo : MonoBehaviour, IInteractActorAction
         if (interact.GetComponent<IInteractable>().Interact(InteractActor))
         {
             Inventory.RemoveGold();
-            PlayerToken.TotalGoldCollected++;
             GetComponent<PlayerToken>().Notify("Item loaded into cargo wagon", false);
             return true;
         }

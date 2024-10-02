@@ -4,6 +4,8 @@ using UnityEngine;
 
 public class PanelController : MonoBehaviour
 {
+    public GameObject ScoreExplainPanel;
+
     private EndGameScorePanel _endGamePanel;
     private RulesController _rulesController;
     private ScorePanel _scorePanel;
@@ -23,6 +25,7 @@ public class PanelController : MonoBehaviour
     void Update()
     {
         _endGamePanel.gameObject.SetActive(_rulesController.IsGameOver);
+        ScoreExplainPanel.gameObject.SetActive(_rulesController.IsGameOver);
         _scorePanel.gameObject.SetActive(_mapCamera.enabled);
     }
 }

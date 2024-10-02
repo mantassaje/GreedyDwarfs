@@ -72,6 +72,7 @@ public class PlayerToken : MonoBehaviour, IPunObservable
         else
         {
             stream.ReceiveNext();
+            stream.ReceiveNext();
         }
     }
 }

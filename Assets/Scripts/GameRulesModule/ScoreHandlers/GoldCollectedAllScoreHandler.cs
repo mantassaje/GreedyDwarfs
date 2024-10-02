@@ -18,9 +18,16 @@ namespace Assets.Scripts.GameRulesModule.ScoreHandlers
                 return;
             }
 
+            var minCollected = scoreSheetController.ActorScoreSheets.Values.Select(sheet => sheet.TotalGoldCollectedRound).Min();
+
+            if (scoreSheetController.ActorScoreSheets.Values.All(sheet => sheet.TotalGoldCollectedRound == minCollected))
+            {
+                minCollected = 0;
+            }
+
             foreach (var sheet in scoreSheetController.ActorScoreSheets.Values)
             {
-                if (sheet.TotalGoldCollectedRound > 0)
+                if (sheet.TotalGoldCollectedRound > minCollected)
                 {
                     sheet.AddToTotalScoreRound += 1;
                 }

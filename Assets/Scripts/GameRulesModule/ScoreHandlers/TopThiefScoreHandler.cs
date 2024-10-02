@@ -11,7 +11,7 @@ namespace Assets.Scripts.GameRulesModule.ScoreHandlers
 
             var addScore = ruleController.IsGoldCollected
                 ? 1
-                : 2;
+                : 3;
 
             if (!scoreSheetController.ActorScoreSheets.Values.All(sheet => sheet.TotalStolenLootRound == 0))
             {

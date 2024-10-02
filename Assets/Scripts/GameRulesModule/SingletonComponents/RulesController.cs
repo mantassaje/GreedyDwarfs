@@ -5,7 +5,6 @@ using Photon.Pun;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
-using UnityEngine.SceneManagement;
 
 [RequireComponent(typeof(PhotonView))]
 public class RulesController : MonoBehaviour, IPunObservable
@@ -15,7 +14,6 @@ public class RulesController : MonoBehaviour, IPunObservable
     public int GoldGoal = 3;
     public bool IsGameOver = false;
     public bool IsGoldCollected = false;
-    public int RemoveCaveInCount = 3;
 
     public float RoundTotalSeconds = 60;
 
@@ -42,7 +40,6 @@ public class RulesController : MonoBehaviour, IPunObservable
         if (PhotonNetwork.IsMasterClient)
         {
             GoldGoal = PhotonNetwork.CurrentRoom.PlayerCount * GoldGoalPerPlayer;
-            RemoveCaveIns();
         }
 
         ScoreHandlers = new List<IScoreHandler>()
@@ -59,18 +56,6 @@ public class RulesController : MonoBehaviour, IPunObservable
             // Commit
             new CommitTotalScoreHandler()
         };
-    }
-
-    public void RemoveCaveIns()
-    {
-        var caveIns = FindObjectsOfType<Cavein>().ToList();
-
-        for(int i = 0; i < RemoveCaveInCount; i++)
-        {
-            var caveIn = caveIns.PickRandom();
-            caveIns.Remove(caveIn);
-            caveIn.Destroy();
-        }
     }
 
     public void AddGoldToTotal()
@@ -109,6 +94,7 @@ public class RulesController : MonoBehaviour, IPunObservable
         if (PhotonNetwork.IsMasterClient)
         {
             Debug.Log("ReloadScene called.");
+            PhotonNetwork.DestroyAll();
             PhotonNetwork.LoadLevel("Reload");
         }
     }

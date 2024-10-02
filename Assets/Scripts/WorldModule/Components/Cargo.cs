@@ -15,6 +15,7 @@ public class Cargo : MonoBehaviour, IInteractable
 
     public bool Interact(InteractActor actor)
     {
+        actor.Player.TotalGoldCollected++;
         RulesController.AddGoldToTotal();
 
         Blink.BlinkOnce();

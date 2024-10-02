@@ -27,14 +27,15 @@ public class EndGameScorePanel : MonoBehaviour
     void Update()
     {
         EndGameInfoText.text = _rulesController.IsGoldCollected 
-            ? "Good job! Quota is reached (Worst thief loses)."
+            ? "Good job! Quota is reached."
             : "Bad dwarves! Quota is not reached (Best thief wins).";
     }
 
     private void Redraw()
     {
         var sheets = _scoreSheetController.ActorScoreSheets.Values
-            .OrderByDescending(sheet => sheet.TotalStolenLootRound);
+            .OrderByDescending(sheet => sheet.TotalScore)
+            .ThenByDescending(sheet => sheet.AddToTotalScoreRound);
 
         _endGamePlayerScorePanelStack.Redraw(
                sheets,

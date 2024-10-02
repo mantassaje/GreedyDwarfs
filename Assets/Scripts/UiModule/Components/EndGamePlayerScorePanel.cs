@@ -18,7 +18,11 @@ public class EndGamePlayerScorePanel : MonoBehaviour
 
             StolenLootText.text = Sheet.TotalStolenLootRound.ToString();
             CollectedGoldText.text = Sheet.TotalGoldCollectedRound.ToString();
-            TotalScoreText.text = $"{Sheet.TotalScore} (+{Sheet.AddToTotalScoreRound})";
+
+
+            TotalScoreText.text = Sheet.AddToTotalScoreRound == 0
+                ? $"{Sheet.TotalScore}"
+                : $"(+{Sheet.AddToTotalScoreRound}) {Sheet.TotalScore}";
         }
     }
 }
